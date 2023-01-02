@@ -4,38 +4,38 @@
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
+
+
+trigger:
+- main
+- releases/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+
+  #API_VERSION: "apigeeapi" 
+  # or 
+  API_VERSION: "googleapi"
+  
+
+
+  DEFAULT_APIGEE_ENV: "default-dev"
+  DEFAULT_APIGEE_ORG: "bap-emea-apigee-5"
+
+  TEST_HOST: 34.117.38.184.nip.io
+  #TEST_HOST: "$(APIGEE_ORG)-$(APIGEE_ENV).apigee.net"
+
+  AUTHOR_EMAIL: $(APIGEE_USER)
+  COMMIT_ID: $(Build.SourceVersion)
+  COMMIT_BRANCH: $(Build.SourceBranch)
+
+  # GCP_SERVICE_ACCOUNT, APIGEE_USER & APIGEE_PASSWORD are stored in Azure Pipeline variable settings
+  
 jobs:
 - job: myJob
   timeoutInMinutes: 10
-
-  trigger:
-  - main
-  - releases/*
-
-  pool:
-    vmImage: 'ubuntu-latest'
-
-  variables:
-
-    #API_VERSION: "apigeeapi" 
-    # or 
-    API_VERSION: "googleapi"
-    
-
-
-    DEFAULT_APIGEE_ENV: "default-dev"
-    DEFAULT_APIGEE_ORG: "bap-emea-apigee-5"
-  
-    TEST_HOST: 34.117.38.184.nip.io
-    #TEST_HOST: "$(APIGEE_ORG)-$(APIGEE_ENV).apigee.net"
-
-    AUTHOR_EMAIL: $(APIGEE_USER)
-    COMMIT_ID: $(Build.SourceVersion)
-    COMMIT_BRANCH: $(Build.SourceBranch)
-
-    # GCP_SERVICE_ACCOUNT, APIGEE_USER & APIGEE_PASSWORD are stored in Azure Pipeline variable settings
-    
-
 
   steps:
 
