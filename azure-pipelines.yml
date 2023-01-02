@@ -4,248 +4,252 @@
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
-trigger:
-- main
-- releases/*
+jobs:
+- job: myJob
+  timeoutInMinutes: 10
 
-pool:
-  vmImage: 'ubuntu-latest'
+  trigger:
+  - main
+  - releases/*
 
-variables:
+  pool:
+    vmImage: 'ubuntu-latest'
 
-  #API_VERSION: "apigeeapi" 
-  # or 
-  API_VERSION: "googleapi"
-  
+  variables:
 
-
-  DEFAULT_APIGEE_ENV: "default-dev"
-  DEFAULT_APIGEE_ORG: "bap-emea-apigee-5"
- 
-  TEST_HOST: 34.117.38.184.nip.io
-  #TEST_HOST: "$(APIGEE_ORG)-$(APIGEE_ENV).apigee.net"
-
-  AUTHOR_EMAIL: $(APIGEE_USER)
-  COMMIT_ID: $(Build.SourceVersion)
-  COMMIT_BRANCH: $(Build.SourceBranch)
-
-  # GCP_SERVICE_ACCOUNT, APIGEE_USER & APIGEE_PASSWORD are stored in Azure Pipeline variable settings
-  
-
-
-steps:
-
-# Set Deployment Target: Define Apigee organization and environmnet from Git Branch
-- bash: |
-    echo $COMMIT_BRANCH is commited
-    if [ $COMMIT_BRANCH == "refs/heads/prod" ]; then
-      # Prod branch --> Apigee prod environment 
-      echo "##vso[task.setvariable variable=APIGEE_ORG]$DEFAULT_APIGEE_ORG"
-      echo "##vso[task.setvariable variable=APIGEE_ENV]prod"
-    else
-      # all ohers branches --> default environment
-      echo "##vso[task.setvariable variable=APIGEE_ORG]$DEFAULT_APIGEE_ORG"
-      echo "##vso[task.setvariable variable=APIGEE_ENV]$DEFAULT_APIGEE_ENV"
-    fi
-  enabled: "true"
-  displayName: Set Deployment Target
-  env:  
-    DEFAULT_APIGEE_ORG: $(DEFAULT_APIGEE_ORG)
-    DEFAULT_APIGEE_ENV: $(DEFAULT_APIGEE_ENV)
-    COMMIT_BRANCH: $(COMMIT_BRANCH)
-
-
-# install node.js tools and dependencies
-- task: NodeTool@0
-  inputs:
-    versionSpec: '12.x'
-  enabled: "true"
+    #API_VERSION: "apigeeapi" 
+    # or 
+    API_VERSION: "googleapi"
     
-- task: Npm@1
-  inputs:
-    command: 'install'
-    workingDir: '.'
-  displayName: npmInstalls
-  enabled: "true"
 
 
-# run Apigeelint, API proxy linter
-# generate result output in Junit because Azure task PublishTestResults doesn't (yet) support html
-- bash: |
-    echo "run Apigeelint" 
-    mkdir code_test_output
-    ./node_modules/apigeelint/cli.js -s apiproxy/ -e PO013 -f html.js  > code_test_output/apigeelint-output.html
-    cat code_test_output/apigeelint-output.html
-  enabled: "true"
-  displayName: runApigeeLint
+    DEFAULT_APIGEE_ENV: "default-dev"
+    DEFAULT_APIGEE_ORG: "bap-emea-apigee-5"
+  
+    TEST_HOST: 34.117.38.184.nip.io
+    #TEST_HOST: "$(APIGEE_ORG)-$(APIGEE_ENV).apigee.net"
+
+    AUTHOR_EMAIL: $(APIGEE_USER)
+    COMMIT_ID: $(Build.SourceVersion)
+    COMMIT_BRANCH: $(Build.SourceBranch)
+
+    # GCP_SERVICE_ACCOUNT, APIGEE_USER & APIGEE_PASSWORD are stored in Azure Pipeline variable settings
+    
+
+
+  steps:
+
+  # Set Deployment Target: Define Apigee organization and environmnet from Git Branch
+  - bash: |
+      echo $COMMIT_BRANCH is commited
+      if [ $COMMIT_BRANCH == "refs/heads/prod" ]; then
+        # Prod branch --> Apigee prod environment 
+        echo "##vso[task.setvariable variable=APIGEE_ORG]$DEFAULT_APIGEE_ORG"
+        echo "##vso[task.setvariable variable=APIGEE_ENV]prod"
+      else
+        # all ohers branches --> default environment
+        echo "##vso[task.setvariable variable=APIGEE_ORG]$DEFAULT_APIGEE_ORG"
+        echo "##vso[task.setvariable variable=APIGEE_ENV]$DEFAULT_APIGEE_ENV"
+      fi
+    enabled: "true"
+    displayName: Set Deployment Target
+    env:  
+      DEFAULT_APIGEE_ORG: $(DEFAULT_APIGEE_ORG)
+      DEFAULT_APIGEE_ENV: $(DEFAULT_APIGEE_ENV)
+      COMMIT_BRANCH: $(COMMIT_BRANCH)
+
+
+  # install node.js tools and dependencies
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '12.x'
+    enabled: "true"
+      
+  - task: Npm@1
+    inputs:
+      command: 'install'
+      workingDir: '.'
+    displayName: npmInstalls
+    enabled: "true"
+
+
+  # run Apigeelint, API proxy linter
+  # generate result output in Junit because Azure task PublishTestResults doesn't (yet) support html
+  - bash: |
+      echo "run Apigeelint" 
+      mkdir code_test_output
+      ./node_modules/apigeelint/cli.js -s apiproxy/ -e PO013 -f html.js  > code_test_output/apigeelint-output.html
+      cat code_test_output/apigeelint-output.html
+    enabled: "true"
+    displayName: runApigeeLint
 
 
 
-# run ESlint, javascript linter
-- bash: |
-    echo "run Eslint"
-    ./node_modules/eslint/bin/eslint.js -c ./.eslintrc-jsc.yml --format html ./apiproxy/resources/jsc > code_test_output/eslint-out.html
-    cat code_test_output/eslint-out.html
-  enabled: "true"
-  displayName: runESlint
+  # run ESlint, javascript linter
+  - bash: |
+      echo "run Eslint"
+      ./node_modules/eslint/bin/eslint.js -c ./.eslintrc-jsc.yml --format html ./apiproxy/resources/jsc > code_test_output/eslint-out.html
+      cat code_test_output/eslint-out.html
+    enabled: "true"
+    displayName: runESlint
 
 
-# Publish static code analysis folder results
-- task: PublishBuildArtifacts@1
-  displayName: publishStaticCodeTestsResults
-  enabled: "true"
-  inputs:
-    pathToPublish: code_test_output
-    artifactName: static-code-analysis
+  # Publish static code analysis folder results
+  - task: PublishBuildArtifacts@1
+    displayName: publishStaticCodeTestsResults
+    enabled: "true"
+    inputs:
+      pathToPublish: code_test_output
+      artifactName: static-code-analysis
 
-# run Mocha, JavaScript unit test 
-- bash: |
-    echo "run Mocha"
-    mkdir unit_test_output
-    ./node_modules/nyc/bin/nyc.js --reporter=html --reporter=html ./node_modules/mocha/bin/_mocha ./test/unit
-    cp ./coverage/* ./unit_test_output
-  enabled: "true"
-  displayName: runMocha
-
-
-# Publish unit test folder results
-- task: PublishBuildArtifacts@1
-  displayName: publishUnitTestsResults
-  enabled: "true"
-  inputs:
-    pathToPublish: unit_test_output
-    artifactName: unit-tests
+  # run Mocha, JavaScript unit test 
+  - bash: |
+      echo "run Mocha"
+      mkdir unit_test_output
+      ./node_modules/nyc/bin/nyc.js --reporter=html --reporter=html ./node_modules/mocha/bin/_mocha ./test/unit
+      cp ./coverage/* ./unit_test_output
+    enabled: "true"
+    displayName: runMocha
 
 
-# Configure EdgeeConfig/edge.json file: update target environment name
-- bash: |
-    sed -i "s/target_apigee_env/$(APIGEE_ENV)/g" ./EdgeConfig/edge.json
-  enabled: "true"
-  displayName: Update edge.json
+  # Publish unit test folder results
+  - task: PublishBuildArtifacts@1
+    displayName: publishUnitTestsResults
+    enabled: "true"
+    inputs:
+      pathToPublish: unit_test_output
+      artifactName: unit-tests
 
 
-# Generate GCP Service Account file from Azure Pipeline variable GCP_SERVICE_ACCOUNT
-# if deploy to Apigee X/hybrid
-- bash: |
-    echo '$(GCP_SERVICE_ACCOUNT)' > sa.json
-  enabled: "true"
-  condition:  and(succeeded(), eq(variables.API_VERSION, 'googleapi'))
-  displayName: Generate SA Key file 
-  env:  
-    GCP_SERVICE_ACCOUNT: $(GCP_SERVICE_ACCOUNT)
+  # Configure EdgeeConfig/edge.json file: update target environment name
+  - bash: |
+      sed -i "s/target_apigee_env/$(APIGEE_ENV)/g" ./EdgeConfig/edge.json
+    enabled: "true"
+    displayName: Update edge.json
 
 
-# Maven Deploy Apigee Configuration (from EdgeeConfig/edge.json): Apigee edge
-- task: Maven@3
-  displayName: mvnApigeeConfigurationApigee
-  enabled: "true"
-  condition:  and(succeeded(), eq(variables.API_VERSION, 'apigeeapi'))
-  inputs:
-    mavenPomFile: './pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.8'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    goals: "install -P$(API_VERSION) -Dapigee.org=$(APIGEE_ORG) -Denv=$(APIGEE_ENV) -Dapigee.username=$(APIGEE_USER) -Dapigee.password=$(APIGEE_PASSWORD) -Dapigee.config.file=EdgeConfig/edge.json -Dapigee.config.options=update"
-  env:  
+  # Generate GCP Service Account file from Azure Pipeline variable GCP_SERVICE_ACCOUNT
+  # if deploy to Apigee X/hybrid
+  - bash: |
+      echo '$(GCP_SERVICE_ACCOUNT)' > sa.json
+    enabled: "true"
+    condition:  and(succeeded(), eq(variables.API_VERSION, 'googleapi'))
+    displayName: Generate SA Key file 
+    env:  
+      GCP_SERVICE_ACCOUNT: $(GCP_SERVICE_ACCOUNT)
+
+
+  # Maven Deploy Apigee Configuration (from EdgeeConfig/edge.json): Apigee edge
+  - task: Maven@3
+    displayName: mvnApigeeConfigurationApigee
+    enabled: "true"
+    condition:  and(succeeded(), eq(variables.API_VERSION, 'apigeeapi'))
+    inputs:
+      mavenPomFile: './pom.xml'
+      mavenOptions: '-Xmx3072m'
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '1.8'
+      jdkArchitectureOption: 'x64'
+      publishJUnitResults: true
+      goals: "install -P$(API_VERSION) -Dapigee.org=$(APIGEE_ORG) -Denv=$(APIGEE_ENV) -Dapigee.username=$(APIGEE_USER) -Dapigee.password=$(APIGEE_PASSWORD) -Dapigee.config.file=EdgeConfig/edge.json -Dapigee.config.options=update"
+    env:  
+        APIGEE_PASS: $(APIGEE_PASS)
+          
+
+  # Maven Deploy Apigee Configuration (from EdgeeConfig/edge.json): Apigee X/hybrid
+  - task: Maven@3
+    displayName: mvnApigeeConfigurationGoogle
+    enabled: "true"
+    condition:  and(succeeded(), eq(variables.API_VERSION, 'googleapi'))
+    inputs:
+      mavenPomFile: './pom.xml'
+      mavenOptions: '-Xmx3072m'
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '1.8'
+      jdkArchitectureOption: 'x64'
+      publishJUnitResults: true
+      goals: "install -P$(API_VERSION) -Dapigee.org=$(APIGEE_ORG) -Denv=$(APIGEE_ENV) -Dsa=sa.json -Dapigee.config.file=./EdgeConfig/edge.json -Dapigee.config.options=update"
+
+
+  # Maven Config Env.
+  - task: Maven@3
+    displayName: mvnProcessResources
+    enabled: "true"
+    inputs:
+      mavenPomFile: 'pom.xml'
+      mavenOptions: '-Xmx3072m'
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '1.8'
+      jdkArchitectureOption: 'x64'
+      publishJUnitResults: true
+      goals: "process-resources -P$(API_VERSION) -Dcommit=$(GIT_COMMIT) -Dbranch=$(GIT_BRANCH) -Dauthor=$(AUTHOR_EMAIL) -e"
+
+
+  # Maven Package proxy bundle
+  - task: Maven@3
+    displayName: mvnApigeeConfigure
+    enabled: "true"
+    inputs:
+      mavenPomFile: 'pom.xml'
+      mavenOptions: '-Xmx3072m'
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '1.8'
+      jdkArchitectureOption: 'x64'
+      publishJUnitResults: true
+      goals: "apigee-enterprise:configure -P$(API_VERSION) -Dorg=$(APIGEE_ORG) -Denv=$(APIGEE_ENV)" 
+
+
+  # Maven Deploy proxy bundle: Apigee Edge
+  - task: Maven@3
+    displayName: mvnApigeeDeployApigee
+    enabled: "true"
+    condition:  and(succeeded(), eq(variables.API_VERSION, 'apigeeapi'))
+    inputs:
+      mavenPomFile: 'pom.xml'
+      mavenOptions: '-Xmx3072m'
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '1.8'
+      jdkArchitectureOption: 'x64'
+      publishJUnitResults: true
+      goals: "apigee-enterprise:deploy -P$(API_VERSION) -Dorg=$(APIGEE_ORG) -Denv=$(APIGEE_ENV) -Dpassword=$(APIGEE_PASSWORD) -Dusername=$(APIGEE_USER)" 
+    env:
       APIGEE_PASS: $(APIGEE_PASS)
-        
-
-# Maven Deploy Apigee Configuration (from EdgeeConfig/edge.json): Apigee X/hybrid
-- task: Maven@3
-  displayName: mvnApigeeConfigurationGoogle
-  enabled: "true"
-  condition:  and(succeeded(), eq(variables.API_VERSION, 'googleapi'))
-  inputs:
-    mavenPomFile: './pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.8'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    goals: "install -P$(API_VERSION) -Dapigee.org=$(APIGEE_ORG) -Denv=$(APIGEE_ENV) -Dsa=sa.json -Dapigee.config.file=./EdgeConfig/edge.json -Dapigee.config.options=update"
 
 
-# Maven Config Env.
-- task: Maven@3
-  displayName: mvnProcessResources
-  enabled: "true"
-  inputs:
-    mavenPomFile: 'pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.8'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    goals: "process-resources -P$(API_VERSION) -Dcommit=$(GIT_COMMIT) -Dbranch=$(GIT_BRANCH) -Dauthor=$(AUTHOR_EMAIL) -e"
+  # Maven Deploy proxy bundle: Apigee X/hybrid
+  - task: Maven@3
+    displayName: mvnApigeeDeployGoogle
+    enabled: "true"
+    condition:  and(succeeded(), eq(variables.API_VERSION, 'googleapi'))
+    inputs:
+      mavenPomFile: 'pom.xml'
+      mavenOptions: '-Xmx3072m'
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '1.8'
+      jdkArchitectureOption: 'x64'
+      publishJUnitResults: true
+      goals: "apigee-enterprise:deploy -P$(API_VERSION) -Dapigee.org=$(APIGEE_ORG) -Denv=$(APIGEE_ENV) -Dsa=sa.json" 
+      
 
-
-# Maven Package proxy bundle
-- task: Maven@3
-  displayName: mvnApigeeConfigure
-  enabled: "true"
-  inputs:
-    mavenPomFile: 'pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.8'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    goals: "apigee-enterprise:configure -P$(API_VERSION) -Dorg=$(APIGEE_ORG) -Denv=$(APIGEE_ENV)" 
-
-
-# Maven Deploy proxy bundle: Apigee Edge
-- task: Maven@3
-  displayName: mvnApigeeDeployApigee
-  enabled: "true"
-  condition:  and(succeeded(), eq(variables.API_VERSION, 'apigeeapi'))
-  inputs:
-    mavenPomFile: 'pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.8'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    goals: "apigee-enterprise:deploy -P$(API_VERSION) -Dorg=$(APIGEE_ORG) -Denv=$(APIGEE_ENV) -Dpassword=$(APIGEE_PASSWORD) -Dusername=$(APIGEE_USER)" 
-  env:
-    APIGEE_PASS: $(APIGEE_PASS)
-
-
-# Maven Deploy proxy bundle: Apigee X/hybrid
-- task: Maven@3
-  displayName: mvnApigeeDeployGoogle
-  enabled: "true"
-  condition:  and(succeeded(), eq(variables.API_VERSION, 'googleapi'))
-  inputs:
-    mavenPomFile: 'pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.8'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    goals: "apigee-enterprise:deploy -P$(API_VERSION) -Dapigee.org=$(APIGEE_ORG) -Denv=$(APIGEE_ENV) -Dsa=sa.json" 
+  # run Apickli, API test integration
+  - bash: |
+      echo "run Apickli"
+      mkdir integration_output
+      export NODE_TLS_REJECT_UNAUTHORIZED="0"
+      sed -i "s/organization_hostname/$TEST_HOST/g" ./test/integration/features/support/init.js
+      node ./node_modules/cucumber/bin/cucumber-js ./test/integration --format json:report.json
+      node ./test/integration/index.js
+      cp ./cucumber_report.html integration_output/apickli_report.html 
+    displayName: runApickli
+    enabled: "true"
     
 
-# run Apickli, API test integration
-- bash: |
-    echo "run Apickli"
-    mkdir integration_output
-    export NODE_TLS_REJECT_UNAUTHORIZED="0"
-    sed -i "s/organization_hostname/$TEST_HOST/g" ./test/integration/features/support/init.js
-    node ./node_modules/cucumber/bin/cucumber-js ./test/integration --format json:report.json
-    node ./test/integration/index.js
-    cp ./cucumber_report.html integration_output/apickli_report.html 
-  displayName: runApickli
-  enabled: "true"
-  
-
-# Publish integration test folder result
-- task: PublishBuildArtifacts@1
-  displayName: publishInteegrationTestsResults
-  enabled: "true"
-  inputs:
-    pathToPublish: integration_output
-    artifactName: integration-tests
+  # Publish integration test folder result
+  - task: PublishBuildArtifacts@1
+    displayName: publishInteegrationTestsResults
+    enabled: "true"
+    inputs:
+      pathToPublish: integration_output
+      artifactName: integration-tests
 
 
