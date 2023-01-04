@@ -35,6 +35,11 @@ jobs:
   steps:
   - bash: |
       echo "Job Apigee-Commit-Check"   
+      echo "----"
+      pwd
+      echo "----"
+      ls
+      echo "----"
 
       # Diff HEAD with the previous commit
       diff=$(git diff --name-only HEAD^ HEAD)
