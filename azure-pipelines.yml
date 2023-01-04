@@ -45,7 +45,7 @@ jobs:
       # diff=$(git diff --name-only HEAD^..HEAD )
       # diff=$(git diff  --name-only --relative --diff-filter=AM HEAD^ HEAD)
       
-      export COMMIT_HASH=`git rev-parse --short HEAD^`
+      export COMMIT_HASH=`git rev-parse --short HEAD`
       export diff=`git diff-tree --no-commit-id --name-only -r $COMMIT_HASH`
 
       echo "Files updated in the last commit:" $diff
