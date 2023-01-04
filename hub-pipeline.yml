@@ -1,6 +1,6 @@
 resources:
   pipelines:
-  - pipeline: g-lalevee.Apigee-ApiHub-Simple-Azure-Pipeline # Name of the pipeline resource.
+  - pipeline: azure-pipelines # Name of the pipeline resource.
     source: g-lalevee.Apigee-ApiHub-Simple-Azure-Pipeline # The name of the pipeline referenced by this pipeline resource.
     # project: xxxxx # Required only if the source pipeline is in another project
     trigger: true # Run apihub-pipeline when any run of apigee-pipeline completes
