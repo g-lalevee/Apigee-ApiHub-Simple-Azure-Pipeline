@@ -34,7 +34,20 @@ variables:
   # GCP_SERVICE_ACCOUNT, APIGEE_USER & APIGEE_PASSWORD are stored in Azure Pipeline variable settings
   
 jobs:
-- job: myJob
+
+- job: Apigee-Commit-Check
+  timeoutInMinutes: 10
+
+  steps:
+
+  - bash: |
+      echo $COMMIT_BRANCH is commited      
+    enabled: "true"
+    displayName: Apigee-Commit-Check-1
+
+
+
+- job: Apigee-Proxy-Deploy
   timeoutInMinutes: 10
 
   steps:
@@ -81,6 +94,7 @@ jobs:
       ./node_modules/apigeelint/cli.js -s apiproxy/ -e PO013 -f html.js  > code_test_output/apigeelint-output.html
       cat code_test_output/apigeelint-output.html
     enabled: "true"
+    workingDirectory: apiProxy
     displayName: runApigeeLint
 
 
@@ -91,8 +105,8 @@ jobs:
       ./node_modules/eslint/bin/eslint.js -c ./.eslintrc-jsc.yml --format html ./apiproxy/resources/jsc > code_test_output/eslint-out.html
       cat code_test_output/eslint-out.html
     enabled: "true"
+    workingDirectory: apiProxy $$$$$$
     displayName: runESlint
-
 
   # Publish static code analysis folder results
   - task: PublishBuildArtifacts@1
@@ -252,4 +266,14 @@ jobs:
       pathToPublish: integration_output
       artifactName: integration-tests
 
+- job:  Apigee-Hub-Publish
+  timeoutInMinutes: 10
 
+  steps:
+
+  - bash: |
+      echo "Apigee-Hub-Publish-1"      
+    enabled: "true"
+    displayName:  Apigee-Hub-Publish-1
+
+ 

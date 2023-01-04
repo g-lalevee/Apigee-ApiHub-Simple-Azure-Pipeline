@@ -1,0 +1,80 @@
+#
+# Copyright 2022 Google Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# 
+apiVersion: apigeeregistry/v1
+kind: API
+metadata:
+ name: demoapi
+ labels:
+   apihub-business-unit: googees
+   apihub-lifecycle: develop
+   apihub-style: apihub-openapi
+   apihub-target-users: public
+   apihub-team: bap-ce-emea
+ annotations:
+   apihub-primary-contact: xtof@example.com
+   apihub-primary-contact-description: Apigee BAP demo builder team 
+data:
+ displayName: Airports cicd
+ description: "This Airports-CICD API is meant to show how an API description document can have a revision history as well as a set of deployments. \n\nThings to check out:\n- History tab to see how the revisions to the OpenAPI document over time\n- Deployments view, to understand which revision is in use where\n- Versions view, to have a clear view off all API versions and status."
+ recommendedDeployment: dev
+ availability: NONE
+ versions:
+   - metadata:
+       name: "100"
+       annotations:
+         apihub-end-of-life-type: apihub-unknown
+     data:
+       displayName: 1.0.0
+       state: design
+       specs:
+         - metadata:
+             name: airport-1.0.0yaml
+             annotations:
+               apihub-commit-hash: 363f7290fd2b2eeb9b06abe308e8deee70c56d4b
+           data:
+             filename: airport-1.0.0.yaml
+             mimeType: "application/x.openapi"
+             sourceURI: "file://./specs/airport-1.0.0.yaml"
+ artifacts:
+   - kind: ReferenceList
+     metadata:
+       name: apihub-related
+     data:
+       displayName: ""
+       description: Defines a list of related resources
+       references:
+         - id: github
+           displayName: GitHub
+           category: apihub-source-code
+           resource: ""
+           uri: https://github.com/apigee/registry
+         - id: performance-dashboard
+           displayName: Performance dashboard
+           category: apihub-other
+           resource: ""
+           uri: https://apigee.google.com/organizations/bap-emea-apigee-5/analytics/proxy-performance
+   - kind: ReferenceList
+     metadata:
+       name: apihub-dependencies
+     data:
+       displayName: ""
+       description: Defines a list of dependencies
+       references:
+         - id: gcp-iam
+           displayName: GCP IAM
+           category: apihub-other
+           resource: ""
+           uri: https://console.cloud.google.com/apigee/api-registry/apis/iam/overview

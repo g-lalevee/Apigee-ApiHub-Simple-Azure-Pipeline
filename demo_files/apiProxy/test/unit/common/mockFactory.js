@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 const sinon = require("sinon");
 
 let contextGetVariableMethod;
