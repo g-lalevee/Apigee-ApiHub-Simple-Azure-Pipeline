@@ -46,6 +46,7 @@ jobs:
       if [ -z "$specConfigDiff" ]
       then
         echo "No Api change"
+        echo "##vso[task.setvariable variable=updateHub;isoutput=true]false"
       else
         echo "Api change -> [" $specConfigDiff "]"
         #echo "updateHub=true" >> $GITHUB_ENV
@@ -57,6 +58,7 @@ jobs:
       if [ -z "$apiProxyDiff" ]
       then
         echo "No proxy change"
+        echo "##vso[task.setvariable variable=updateProxy;isoutput=true]false"
       else
         echo "Proxy change -> [" $apiProxyDiff "]"
 
@@ -72,6 +74,7 @@ jobs:
   dependsOn: Apigee_Commit_Check
   variables:
     updateProxy: $[ dependencies.Apigee_Commit_Check.outputs['passOutput.updateProxy'] ]  
+  condition:  and(succeeded(), eq(dependencies.Apigee_Commit_Check.outputs['passOutput.updateProxy'], 'true'))
   steps:
   - bash: |
         echo "Job Apigee-Proxy-Deploy -> " $(updateProxy)       
@@ -87,6 +90,7 @@ jobs:
   dependsOn: Apigee_Proxy_Deploy
   variables:
     updateHub: $[ dependencies.Apigee_Commit_Check.outputs['passOutput.updateHub'] ]  
+  condition:  and(succeeded(), eq(dependencies.Apigee_Commit_Check.outputs['passOutput.updateHub'], 'true'))
   steps:
   - bash: |
       echo "Job Apigee-Hub-Publish -> " $(updateHub)   
