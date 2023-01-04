@@ -34,7 +34,35 @@ jobs:
   timeoutInMinutes: 10
   steps:
   - bash: |
-      echo "Job Apigee-Commit-Check"      
+      echo "Job Apigee-Commit-Check"   
+
+      # Diff HEAD with the previous commit
+      diff=$(git diff --name-only HEAD^ HEAD)
+      echo "Files updated in the last commit:" $diff
+
+      # Check if **SPEC** file(s) changed
+      specConfigDiff=$(echo $diff | tr " " "\n" | grep -E "apiHub/api-config.yaml|apiHub/specs/.+\.(json|yaml)")
+
+      if [ -z "$specConfigDiff" ]
+      then
+        echo "No Api change"
+      else
+        echo "Api change -> [" $specConfigDiff "]"
+        #echo "updateHub=true" >> $GITHUB_ENV
+        echo "##vso[task.setvariable variable=updateHub;isoutput=true]true"
+      fi
+      
+      # Check if ** PROXY ** file(s) changed
+      apiProxyDiff=$(echo $diff | tr " " "\n" | grep -E "apiProxy/apiproxy/.*")
+      if [ -z "$apiProxyDiff" ]
+      then
+        echo "No proxy change"
+      else
+        echo "Proxy change -> [" $apiProxyDiff "]"
+
+        #echo "updateProxy=true" >> $GITHUB_ENV
+        echo "##vso[task.setvariable variable=updateProxy;isoutput=true]true"
+      fi   
     enabled: "true"
     displayName: Apigee-Commit-Check-1
 
@@ -42,9 +70,11 @@ jobs:
 - job: Apigee_Proxy_Deploy
   timeoutInMinutes: 10
   dependsOn: Apigee_Commit_Check
+  variables:
+    updateProxy: $[ dependencies.Apigee_Commit_Check.outputs['passOutput.updateProxy'] ]  
   steps:
   - bash: |
-        echo "Job Apigee-Proxy-Deploy"      
+        echo "Job Apigee-Proxy-Deploy -> " $(updateProxy)       
     enabled: "true"
     env:  
       DEFAULT_APIGEE_ORG: $(DEFAULT_APIGEE_ORG)
@@ -55,9 +85,11 @@ jobs:
 - job:  Apigee_Hub_Publish
   timeoutInMinutes: 10
   dependsOn: Apigee_Proxy_Deploy
+  variables:
+    updateHub: $[ dependencies.Apigee_Commit_Check.outputs['passOutput.updateHub'] ]  
   steps:
   - bash: |
-      echo "Job Apigee-Hub-Publish"      
+      echo "Job Apigee-Hub-Publish -> " $(updateHub)   
     enabled: "true"
     displayName:  Apigee-Hub-Publish-1
 
