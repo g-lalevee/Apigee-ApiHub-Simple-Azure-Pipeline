@@ -41,6 +41,7 @@ jobs:
 
 - job: Apigee_Proxy_Deploy
   timeoutInMinutes: 10
+  dependsOn: Apigee_Commit_Check
   steps:
   - bash: |
         echo "Job Apigee-Proxy-Deploy"      
@@ -53,6 +54,7 @@ jobs:
 
 - job:  Apigee_Hub_Publish
   timeoutInMinutes: 10
+  dependsOn: Apigee_Proxy_Deploy
   steps:
   - bash: |
       echo "Job Apigee-Hub-Publish"      
