@@ -37,8 +37,8 @@ jobs:
       echo "Job Apigee-Commit-Check"   
 
       # Diff HEAD with the previous commit
-      # diff=$(git diff --name-only HEAD^ HEAD)
-      diff=$(git diff  --name-only --relative --diff-filter=AM HEAD^ HEAD)
+      diff=$(git diff --name-only HEAD^ HEAD)
+      # diff=$(git diff  --name-only --relative --diff-filter=AM HEAD^ HEAD)
       echo "Files updated in the last commit:" $diff
 
       # Check if **SPEC** file(s) changed
