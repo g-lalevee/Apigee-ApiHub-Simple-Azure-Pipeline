@@ -1,19 +1,10 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+resources:
+  pipelines:
+  - pipeline: apigee-proxy # Name of the pipeline resource.
+    source: azure-pipelines # The name of the pipeline referenced by this pipeline resource.
+    # project: xxxxx # Required only if the source pipeline is in another project
+    trigger: true # Run apihub-pipeline when any run of apigee-pipeline completes
 
-trigger:
-- main
-
-pool:
-  vmImage: ubuntu-latest
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- bash: echo " apihub-pipeline runs after apigee-pipeline completes"
