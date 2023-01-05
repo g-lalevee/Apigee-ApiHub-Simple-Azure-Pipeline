@@ -34,15 +34,15 @@ steps:
     env:  
       GCP_SERVICE_ACCOUNT: $(GCP_SERVICE_ACCOUNT)
 
-# Maven Deploy Apigee Configuration (from EdgeeConfig/edge.json): Apigee edge
-- task: Maven@3
-  displayName: mvnApigeeConfigurationApigee
-  enabled: "true"
-  inputs:
-    mavenPomFile: 'apiHub/pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.8'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    goals: "install -Pdev -DprojectId=$(APIGEE_ORG) -Doptions=sync -Dfile=./sa.json --no-transfer-progress"
+  # Maven Deploy Apigee Configuration (from EdgeeConfig/edge.json): Apigee edge
+  - task: Maven@3
+    displayName: mvnApigeeConfigurationApigee
+    enabled: "true"
+    inputs:
+      mavenPomFile: 'apiHub/pom.xml'
+      mavenOptions: '-Xmx3072m'
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '1.8'
+      jdkArchitectureOption: 'x64'
+      publishJUnitResults: true
+      goals: "install -Pdev -DprojectId=$(APIGEE_ORG) -Doptions=sync -Dfile=./sa.json --no-transfer-progress"
