@@ -15,4 +15,34 @@ trigger:
     - apiHub
 
 steps:
-- bash: echo "API Hub publish runs first"
+  # Azure pipeline doest allow to change job working directory :(
+  # so... copy all apiHub files to be able to keep GitHub repository organization 
+  - bash: |
+      echo "Copy ./apiHub files to $(pwd)"
+      cp -R ./apiHub . 
+    enabled: "true"
+    displayName: Copy apiHub directory files 
+
+
+  # Generate GCP Service Account file from Azure Pipeline variable GCP_SERVICE_ACCOUNT
+  # if deploy to Apigee X/hybrid
+  - bash: |
+      echo '$(GCP_SERVICE_ACCOUNT)' > sa.json
+    enabled: "true"
+    condition:  and(succeeded(), eq(variables.API_VERSION, 'googleapi'))
+    displayName: Generate SA Key file 
+    env:  
+      GCP_SERVICE_ACCOUNT: $(GCP_SERVICE_ACCOUNT)
+
+# Maven Deploy Apigee Configuration (from EdgeeConfig/edge.json): Apigee edge
+- task: Maven@3
+  displayName: mvnApigeeConfigurationApigee
+  enabled: "true"
+  inputs:
+    mavenPomFile: 'apiHub/pom.xml'
+    mavenOptions: '-Xmx3072m'
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '1.8'
+    jdkArchitectureOption: 'x64'
+    publishJUnitResults: true
+    goals: "install -Pdev -DprojectId=$(APIGEE_ORG) -Doptions=sync -Dfile=./sa.json --no-transfer-progress"
