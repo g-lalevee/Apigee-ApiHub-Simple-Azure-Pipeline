@@ -1,9 +1,12 @@
 
 trigger:
-- main
-- releases/*
-
-
+  branches:
+    include:
+    - main
+    - releases/*
+  paths:
+    include:
+    - apiProxy
 
 # security-lib-ci YAML pipeline
 steps:
