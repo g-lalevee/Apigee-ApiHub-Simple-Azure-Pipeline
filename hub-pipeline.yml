@@ -19,7 +19,7 @@ steps:
   # so... copy all apiHub files to be able to keep GitHub repository organization 
   - bash: |
       echo "Copy ./apiHub files to $(pwd)"
-      cp -R ./apiHub . 
+      cp -R apiHub . 
     enabled: "true"
     displayName: Copy apiHub directory files 
 
@@ -29,7 +29,6 @@ steps:
   - bash: |
       echo '$(GCP_SERVICE_ACCOUNT)' > sa.json
     enabled: "true"
-    condition:  and(succeeded(), eq(variables.API_VERSION, 'googleapi'))
     displayName: Generate SA Key file 
     env:  
       GCP_SERVICE_ACCOUNT: $(GCP_SERVICE_ACCOUNT)
