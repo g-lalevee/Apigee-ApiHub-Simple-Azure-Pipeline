@@ -5,6 +5,14 @@ resources:
     # project: xxxxx # Required only if the source pipeline is in another project
     trigger: true # Run apihub-pipeline when any run of apigee-pipeline completes
 
+trigger:
+  branches:
+    include:
+    - main
+    - releases/*
+  paths:
+    include:
+    - apiHub
 
 steps:
-- bash: echo " apihub-pipeline runs after apigee-pipeline completes"
+- bash: echo "API Hub publish runs first"
