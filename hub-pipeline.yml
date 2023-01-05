@@ -19,7 +19,7 @@ steps:
   # so... copy all apiHub files to be able to keep GitHub repository organization 
   - bash: |
       echo "Copy ./apiHub files to $(pwd)"
-      cp -R apiHub . 
+      cp -R ./apiHub/* . 
     enabled: "true"
     displayName: Copy apiHub directory files 
 
