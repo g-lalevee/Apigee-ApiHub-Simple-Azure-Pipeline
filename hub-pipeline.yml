@@ -20,6 +20,7 @@ steps:
   - bash: |
       echo "Copy ./apiHub files to $(pwd)"
       cp -R ./apiHub/* . 
+      ls
     enabled: "true"
     displayName: Copy apiHub directory files 
 
@@ -28,6 +29,7 @@ steps:
   # if deploy to Apigee X/hybrid
   - bash: |
       echo '$(GCP_SERVICE_ACCOUNT)' > sa.json
+      cat ./sa.json
     enabled: "true"
     displayName: Generate SA Key file 
     env:  
