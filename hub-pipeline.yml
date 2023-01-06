@@ -40,7 +40,7 @@ steps:
     echo "azure hub second"
     ls
     echo "-----------------------"
-    cat myFIle
+    cat myFile
     echo "-----------------------"
   enabled: "true"
   displayName: echo 

@@ -15,7 +15,10 @@ steps:
 # so... copy all apiProxy files to be able to keep GitHub repository organization 
 - bash: |
     echo "azure pipeline first"
-    echo "myFile" > myFIle
+    echo "myFile" > myFile
+    echo "-----------"
+    cat myFile
+    echo "-----------"
   enabled: "true"
   displayName: echo 
 
