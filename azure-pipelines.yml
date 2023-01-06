@@ -12,7 +12,6 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  API_VERSION: "googleapi"
   DEFAULT_APIGEE_ENV: "default-dev"
   DEFAULT_APIGEE_ORG: "bap-emea-apigee-5"
   TEST_HOST: 34.117.38.184.nip.io
