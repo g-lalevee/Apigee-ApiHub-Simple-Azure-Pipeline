@@ -17,9 +17,9 @@ steps:
     echo "azure pipeline first"
     mkdir Apigee_Proxy
     echo "failed" > Apigee_Proxy/pipeline_status
-    echo "-----------"
+    echo "-----pwd------"
     pwd
-    echo "-----------"
+    echo "------cat-----"
     cat Apigee_Proxy/pipeline_status
     echo "-----------"
   enabled: "true"
