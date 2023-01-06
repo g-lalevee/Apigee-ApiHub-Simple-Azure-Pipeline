@@ -23,11 +23,6 @@ steps:
 
 # Azure pipeline doest allow to change job working directory :(
 # so... copy all apiProxy files to be able to keep GitHub repository organization 
-- bash: |
-    echo "azure hub second"
-  enabled: "true"
-  displayName: echo 
-
 
 - task: DownloadPipelineArtifact@2
   inputs:
@@ -40,3 +35,12 @@ steps:
     allowFailedBuilds: true
     artifactName: 'myFile'
     targetPath: '$(Pipeline.Workspace)'
+
+- bash: |
+    echo "azure hub second"
+    ls
+    echo "-----------------------"
+    cat myFile
+    echo "-----------------------"
+  enabled: "true"
+  displayName: echo 
