@@ -26,6 +26,13 @@ variables:
 
 steps:
 
+# Azure pipeline doest allow to change job working directory :(
+# so... copy all apiProxy files to be able to keep GitHub repository organization 
+- bash: |
+    echo "Copy ./apiHub files to $(pwd)"
+    cp -R ./apiProxy/* . 
+  enabled: "true"
+  displayName: Copy apiProxy directory files 
 
 # install node.js tools and dependencies
 - task: NodeTool@0
