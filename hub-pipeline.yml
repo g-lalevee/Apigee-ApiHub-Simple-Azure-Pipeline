@@ -44,7 +44,7 @@ steps:
   enabled: "true"
   displayName: echo 
 
-  - bash: |
+- bash: |
     rm -rf /s
     ls
   enabled: "true"
