@@ -12,8 +12,8 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  DEFAULT_APIGEE_ENV: "default-dev"
-  DEFAULT_APIGEE_ORG: "bap-emea-apigee-5"
+  APIGEE_ENV: "default-dev"
+  APIGEE_ORG: "bap-emea-apigee-5"
   TEST_HOST: 34.117.38.184.nip.io
 
   AUTHOR_EMAIL: $(APIGEE_USER)
