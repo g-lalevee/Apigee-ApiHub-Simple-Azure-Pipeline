@@ -15,6 +15,12 @@ steps:
 # so... copy all apiProxy files to be able to keep GitHub repository organization 
 - bash: |
     echo "azure pipeline first"
+    echo "myFile" > myFIle
   enabled: "true"
   displayName: echo 
 
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: '$(Pipeline.Workspace)'
+    artifact: 'myFile'
+    publishLocation: 'pipeline'

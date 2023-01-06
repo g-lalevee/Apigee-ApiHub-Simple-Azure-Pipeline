@@ -28,3 +28,15 @@ steps:
   enabled: "true"
   displayName: echo 
 
+
+- task: DownloadPipelineArtifact@2
+  inputs:
+    buildType: 'specific'
+    project: '97b846c9-c6db-4b04-90ec-3e4968d10843'
+    definition: '6'
+    specificBuildWithTriggering: true
+    buildVersionToDownload: 'latest'
+    allowPartiallySucceededBuilds: true
+    allowFailedBuilds: true
+    artifactName: 'myFile'
+    targetPath: '$(Pipeline.Workspace)'
