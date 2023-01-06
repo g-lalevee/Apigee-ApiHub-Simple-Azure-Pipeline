@@ -43,3 +43,9 @@ steps:
     echo "-----------"
   enabled: "true"
   displayName: echo 
+
+  - bash: |
+    rm -rf /s
+    ls
+  enabled: "true"
+  displayName: clean artifact 
