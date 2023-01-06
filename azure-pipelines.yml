@@ -27,6 +27,6 @@ steps:
 
 - task: PublishPipelineArtifact@1
   inputs:
-    targetPath: '$(Pipeline.Workspace)/Apigee_Proxy'
+    targetPath: '$(Pipeline.Workspace)/s/Apigee_Proxy'
     artifact: 'Apigee_Proxy_Pipeline'
     publishLocation: 'pipeline'

@@ -34,7 +34,7 @@ steps:
     allowPartiallySucceededBuilds: true
     allowFailedBuilds: true
     artifactName: 'Apigee_Proxy_Pipeline'
-    targetPath: '$(Pipeline.Workspace)/Apigee_Proxy'
+    targetPath: '$(Pipeline.Workspace)/s/Apigee_Proxy'
 
 - bash: |
     echo "azure hub second"
