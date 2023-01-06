@@ -15,15 +15,16 @@ steps:
 # so... copy all apiProxy files to be able to keep GitHub repository organization 
 - bash: |
     echo "azure pipeline first"
-    echo "myFile" > myFile
+    mkdir Apigee_Proxy
+    echo "failed" > Apigee_Proxy/pipeline_status
     echo "-----------"
-    cat myFile
+    cat Apigee_Proxy/pipeline_status
     echo "-----------"
   enabled: "true"
   displayName: echo 
 
 - task: PublishPipelineArtifact@1
   inputs:
-    targetPath: '$(Pipeline.Workspace)'
-    artifact: 'myFile'
+    targetPath: '$(Pipeline.Workspace)/Apigee_Proxy'
+    artifact: 'Apigee_Proxy_Pipeline'
     publishLocation: 'pipeline'

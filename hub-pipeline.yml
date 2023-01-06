@@ -33,14 +33,14 @@ steps:
     buildVersionToDownload: 'latest'
     allowPartiallySucceededBuilds: true
     allowFailedBuilds: true
-    artifactName: 'myFile'
-    targetPath: '$(Pipeline.Workspace)'
+    artifactName: 'Apigee_Proxy_Pipeline'
+    targetPath: '$(Pipeline.Workspace)/Apigee_Proxy'
 
 - bash: |
     echo "azure hub second"
     ls
-    echo "-----------------------"
-    cat myFile
-    echo "-----------------------"
+    echo "-----------"
+    cat Apigee_Proxy/pipeline_status
+    echo "-----------"
   enabled: "true"
   displayName: echo 
