@@ -18,6 +18,8 @@ steps:
     mkdir Apigee_Proxy
     echo "failed" > Apigee_Proxy/pipeline_status
     echo "-----------"
+    pwd
+    echo "-----------"
     cat Apigee_Proxy/pipeline_status
     echo "-----------"
   enabled: "true"
