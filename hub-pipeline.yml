@@ -24,6 +24,7 @@ steps:
 # so... copy all apiProxy files to be able to keep GitHub repository organization 
 
 - task: DownloadPipelineArtifact@2
+  continueOnError: true
   inputs:
     buildType: 'specific'
     project: '97b846c9-c6db-4b04-90ec-3e4968d10843'
@@ -43,4 +44,5 @@ steps:
     echo "-----------"
   enabled: "true"
   displayName: echo 
+
 
