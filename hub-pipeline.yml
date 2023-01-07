@@ -3,26 +3,26 @@ resources:
   - pipeline: azure-pipelines # Name of the pipeline resource.
     source: g-lalevee.Apigee-Proxy # The name of the pipeline referenced by this pipeline resource.
     # project: xxxxx # Required only if the source pipeline is in another project
-    trigger: true # Run apihub-pipeline when any run of apigee-pipeline completes
+    trigger: true # Run apihub-pipeline when any run of azure-pipeline completes
 
 trigger:
   branches:
     include:
     - main
     - releases/*
-#  paths:
-#    include:
-#    - apiHub
+  paths:
+    include:
+    - apiHub
 
-pool:
-  vmImage: 'ubuntu-latest'
+variables:
+  APIGEE_ORG: "bap-emea-apigee-5"
+
+
 
 
 steps:
 
-# Azure pipeline doest allow to change job working directory :(
-# so... copy all apiProxy files to be able to keep GitHub repository organization 
-
+# Retrieve Azure-Pipeline execution status from publisghed artifact
 - task: DownloadPipelineArtifact@2
   continueOnError: true
   inputs:
@@ -36,21 +36,47 @@ steps:
     artifactName: 'Apigee_Proxy_Pipeline'
     targetPath: '$(Pipeline.Workspace)/s/Apigee_Proxy_log'
 
+# If status failed (in same commit), then exit with error
 - bash: |
-    echo "azure hub second --> " ${BUILD_SOURCEVERSION:0:7}
-    ls
-    echo "-----------"
+    echo "Current Build version: " ${BUILD_SOURCEVERSION:0:7}
     Apigee_Proxy_status=$(cat Apigee_Proxy_log/pipeline_status)
-    echo $Apigee_Proxy_status
-    
-    echo "-----------"
+    echo "Azure pipeline last failed Build version: " $(echo $Apigee_Proxy_status | cut -f1 -d"-")
     if [ $Apigee_Proxy_status = "${BUILD_SOURCEVERSION:0:7}-failed" ]
     then
-      echo "KO";
+      echo "Hub Pipeline cannot be executed because Apigee Proxy pipeline failed";
       exit 1
     fi
-
   enabled: "true"
   displayName: echo 
 
 
+  # Azure pipeline doest allow to change job working directory :(
+  # so... copy all apiHub files to be able to keep GitHub repository organization 
+  - bash: |
+      echo "Copy ./apiHub files to $(pwd)"
+      cp -R ./apiHub/* . 
+    enabled: "true"
+    displayName: Copy apiHub directory files 
+
+
+  # Generate GCP Service Account file from Azure Pipeline variable GCP_SERVICE_ACCOUNT
+  # if deploy to Apigee X/hybrid
+  - bash: |
+      echo '$(GCP_SERVICE_ACCOUNT)' > sa.json
+    enabled: "true"
+    displayName: Generate SA Key file 
+    env:  
+      GCP_SERVICE_ACCOUNT: $(GCP_SERVICE_ACCOUNT)
+
+  # Maven Deploy Apigee Configuration (from EdgeeConfig/edge.json): Apigee edge
+  - task: Maven@3
+    displayName: mvnApigeeConfigurationApigee
+    enabled: "true"
+    inputs:
+      mavenPomFile: 'apiHub/pom.xml'
+      mavenOptions: '-Xmx3072m'
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '1.8'
+      jdkArchitectureOption: 'x64'
+      publishJUnitResults: true
+      goals: "install -Pdev -DprojectId=$(APIGEE_ORG) -Doptions=sync -Dfile=./sa.json --no-transfer-progress"
