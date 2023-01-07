@@ -40,8 +40,16 @@ steps:
     echo "azure hub second --> " ${BUILD_SOURCEVERSION:0:7}
     ls
     echo "-----------"
-    cat Apigee_Proxy_log/pipeline_status
+    Apigee_Proxy_status=$(cat Apigee_Proxy_log/pipeline_status)
+    echo $Apigee_Proxy_status
+    
     echo "-----------"
+    if [ $Apigee_Proxy_status = "${BUILD_SOURCEVERSION:0:7}-failed" ]
+    then
+      echo "KO";
+      exit 0
+    fi
+
   enabled: "true"
   displayName: echo 
 
