@@ -36,10 +36,10 @@ steps:
     targetPath: '$(Pipeline.Workspace)/s/Apigee_Proxy'
 
 - bash: |
-    echo "azure hub second"
+    echo "azure hub second --> " ${BUILD_SOURCEVERSION:0:7}
     ls
     echo "-----------"
-    cat Apigee_Proxy/pipeline_status
+    cat Apigee_Proxy_log/pipeline_status
     echo "-----------"
   enabled: "true"
   displayName: echo 
@@ -49,4 +49,3 @@ steps:
     ls
   enabled: "true"
   displayName: clean artifact 
-  

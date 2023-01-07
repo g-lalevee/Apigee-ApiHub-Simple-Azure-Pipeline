@@ -18,18 +18,20 @@ steps:
 # so... copy all apiProxy files to be able to keep GitHub repository organization 
 - bash: |
     echo "azure pipeline first"
-    mkdir Apigee_Proxy
-    echo "failed" > Apigee_Proxy/pipeline_status
+    echo "${BUILD_SOURCEVERSION:0:7}"
+
+    mkdir Apigee_Proxy_log
+    echo ${BUILD_SOURCEVERSION:0:7}-"failed" > Apigee_Proxy_log/pipeline_status
     echo "-----pwd------"
     pwd
     echo "------cat-----"
-    cat Apigee_Proxy/pipeline_status
+    cat Apigee_Proxy_log/pipeline_status
     echo "-----------"
   enabled: "true"
   displayName: echo 
 
 - task: PublishPipelineArtifact@1
   inputs:
-    targetPath: '$(Pipeline.Workspace)/s/Apigee_Proxy'
+    targetPath: '$(Pipeline.Workspace)/s/Apigee_Proxy_log'
     artifact: 'Apigee_Proxy_Pipeline'
     publishLocation: 'pipeline'
