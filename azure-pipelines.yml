@@ -14,8 +14,12 @@ pool:
 
 steps:
 
-# Azure pipeline doest allow to change job working directory :(
-# so... copy all apiProxy files to be able to keep GitHub repository organization 
+- bash: |
+    rm -rf /s
+    ls
+  enabled: "true"
+  displayName: clean artifact 
+
 - bash: |
     echo "azure pipeline first"
     echo "${BUILD_SOURCEVERSION:0:7}"
