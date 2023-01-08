@@ -4,9 +4,9 @@ trigger:
     include:
     - main
     - releases/*
-#  paths:
-#    include:
-#    - apiProxy
+  paths:
+    include:
+    - apiProxy
 
 pool:
   vmImage: 'ubuntu-latest'

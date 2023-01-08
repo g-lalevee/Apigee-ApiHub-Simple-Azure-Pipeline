@@ -10,9 +10,9 @@ trigger:
     include:
     - main
     - releases/*
-#  paths:
-#    include:
-#    - apiHub
+  paths:
+    include:
+    - apiHub
 
 variables:
   APIGEE_ORG: "bap-emea-apigee-5"
