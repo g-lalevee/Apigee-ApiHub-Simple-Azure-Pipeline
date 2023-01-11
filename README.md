@@ -41,7 +41,7 @@ Implementation of a CI/CD pipeline for Apigee using
 
 ## Limitations & Requirements
 
-- The authentication to the Apigee X / Apigee hybrid API is done using a GCP Service Account. See CI/CD Configuration [Instructions](https://xxx).
+- The authentication to the Apigee X / Apigee hybrid API is done using a GCP Service Account. See CI/CD Configuration.
 - Apigee Hub must be provisioned. See [Api Hub Documentation](https://cloud.google.com/apigee/docs/api-hub/get-started-api-hub)
 - The setup described in this reference implementation is based on Azure DevOps pipeline. You must have a Azure account you will use to create a pipeline linked to this GitHub repository. See [Azure DevOps Services](https://azure.microsoft.com/en-us/services/devops/).
 
@@ -112,33 +112,33 @@ Copy `<your-new-service-account-name>-key.json` file content to clipboard.
 You will create 2 pipelines Apigee-Proxy and Apigee-ApiHub.
 
 
-1.  Create Apigee-Proxy pipeline<BR>
+1.  Create **Apigee-Proxy** pipeline<BR>
 In your [Azure DevOps account](https://dev.azure.com), create a new project. From the **Pipelines** menu, select **Pipeline** and select **GitHub**, then select your cloned repository as source repository. <BR>
 
 2.  Add pipeline variable `GCP_SERVICE_ACCOUNT`, to store your GCP Service Account json key:
-- Click **Variables** button to add variables.
+- Click **Variables** button to add variable.
 - Click the **+** button.<BR>In the New variable modal, fill in the details:
   - Key: GCP_SERVICE_ACCOUNT
   - Value: paste clipboard (containing GCP SA JSON key copied before)
   - Keep this value secret: checked
   - Click the **OK** button
 
-3. Save pipeline: click  **Run** button then **Save**.<BR>
+3. Save pipeline: click  **Run** button right arrow then **Save**.<BR>
 
-4.  Create Apigee-apiHub pipeline<BR>
+4.  Create **Apigee-apiHub** pipeline<BR>
 - From the **Pipelines** menu, click **New pipeline**
 - Select **GitHub** source, then select your cloned repository as source repository.
 - Select **Select an existing YAML file**, then from **Path** dropdown, select file **/hub-pipeline.yml**. Click **Continue**.  
 
 5.  Add pipeline variable `GCP_SERVICE_ACCOUNT`, to store your GCP Service Account json key:
-- Click **Variables** button to add variables.
+- Click **Variables** button to add variable.
 - Click the **+** button.<BR>In the New variable modal, fill in the details:
   - Key: GCP_SERVICE_ACCOUNT
   - Value: paste clipboard (containing GCP SA JSON key copied before)
   - Keep this value secret: checked
   - Click the **OK** button
 
-6. Save pipeline: click  **Run** button then **Save**.<BR>
+6. Save pipeline: click  **Run** button right arrow then **Save**.<BR>
 
 ***
 
@@ -186,10 +186,10 @@ In **Variables** section, change `GCP_PROJECT` by your GCP Project name. Save it
 2. Save
 3. Commit, Push
 
-Use the Azure DeveOps UI to monitor your pipeline execution and read test reports:
+Use the Azure DeveOps UI to monitor your pipeline execution and read test reports (in pipeline artifact):
 
 - Go to **Pipelines** menu, then select the **Runs** section. <BR> 
-You should see only Apigee-apiHub pipeline running as only API has been updated **design** status:
+You should see only **Apigee-apiHub** pipeline running, as:
   - Apigee proxy was not updated/commited
   - API is updated: API version 1.0.0 in **design** status
 
@@ -226,7 +226,7 @@ Open API Hub service console and verify that the API 1.0.0 was published in **de
 Use the Azure DeveOps UI to monitor your pipelines execution and read test reports:
 
 - Go to **Pipelines** menu, then select the **Runs** section. <BR> 
-You should see both Apigee-Proxy pipeline and Apigee-apiHub pipeline running, one then the other:
+You should see both **Apigee-Proxy** pipeline and **Apigee-apiHub** pipeline running, one then the other, as:
   - Apigee proxy was updated 
   - API is updated: API version 1.0.0 in **develop** status and deployed
 
@@ -255,7 +255,7 @@ Open Apigee console and verify that the **airports-cicd** was deployed in the ri
 
 Use the Azure DeveOps UI to monitor your pipelines execution and read test reports:
 
-You should see only Apigee-apiHub pipeline running: 
+You should see only **Apigee-apiHub** pipeline running, as: 
   - Apigee proxy was not updated (from Apigee proxy point of view, no difference between API v1.0.0 and API v1.0.1)
   - API is updated: API version 1.0.1 in **Develop** status, and move API 1.0.0 in **Retired** status
 
@@ -282,7 +282,7 @@ Open API Hub service console and verify that the API 1.0.1 was published in **De
 
 Use the Azure DeveOps UI to monitor your pipelines execution and read test reports:
 
-You should see only Apigee-apiHub pipeline running: 
+You should see only **Apigee-apiHub** pipeline running, as: 
   - Apigee proxy was not updated (from Apigee proxy point of view, no difference between API v1.0.0 and API v1.0.1)
   - API is updated: Api version 2.0.0 in **design** status
 
