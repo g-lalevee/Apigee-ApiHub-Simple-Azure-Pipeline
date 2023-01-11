@@ -15,10 +15,9 @@ trigger:
     - apiHub
 
 variables:
-  APIGEE_ORG: "bap-emea-apigee-5"
+  GCP_PROJECT: "bap-emea-apigee-5"
 
-
-
+  # GCP_SERVICE_ACCOUNT is stored in Azure Pipeline variable settings
 
 steps:
 
@@ -35,6 +34,7 @@ steps:
     allowFailedBuilds: true
     artifactName: 'Apigee_Proxy_Pipeline'
     targetPath: '$(Pipeline.Workspace)/s/Apigee_Proxy_log'
+
 
 # If status failed (in same commit), then exit with error
 - bash: |
@@ -60,7 +60,6 @@ steps:
 
 
 # Generate GCP Service Account file from Azure Pipeline variable GCP_SERVICE_ACCOUNT
-# if deploy to Apigee X/hybrid
 - bash: |
     echo '$(GCP_SERVICE_ACCOUNT)' > sa.json
   enabled: "true"
@@ -68,7 +67,8 @@ steps:
   env:  
     GCP_SERVICE_ACCOUNT: $(GCP_SERVICE_ACCOUNT)
 
-# Maven Deploy Apigee Configuration (from EdgeeConfig/edge.json): Apigee edge
+
+# Publish API to API Hub (option:sync)
 - task: Maven@3
   displayName: mvnApigeeConfigurationApigee
   enabled: "true"
@@ -79,4 +79,4 @@ steps:
     jdkVersionOption: '1.8'
     jdkArchitectureOption: 'x64'
     publishJUnitResults: true
-    goals: "install -Pdev -DprojectId=$(APIGEE_ORG) -Doptions=sync -Dfile=./sa.json --no-transfer-progress"
+    goals: "install -Pdev -DprojectId=$(GCP_PROJECT) -Doptions=sync -Dfile=./sa.json --no-transfer-progress"

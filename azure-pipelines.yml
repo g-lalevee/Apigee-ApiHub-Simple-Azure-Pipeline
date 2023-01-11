@@ -16,11 +16,10 @@ variables:
   APIGEE_ORG: "bap-emea-apigee-5"
   TEST_HOST: 34.117.38.184.nip.io
 
-  AUTHOR_EMAIL: $(APIGEE_USER)
   COMMIT_ID: $(Build.SourceVersion)
   COMMIT_BRANCH: $(Build.SourceBranch)
 
-  # GCP_SERVICE_ACCOUNT, APIGEE_USER & APIGEE_PASSWORD are stored in Azure Pipeline variable settings
+  # GCP_SERVICE_ACCOUNT is stored in Azure Pipeline variable settings
   
 
 
@@ -29,7 +28,6 @@ steps:
 # Azure pipeline doest allow to change job working directory :(
 # so... copy all apiProxy files to be able to keep GitHub repository organization 
 - bash: |
-    exit 1
     echo "Copy ./apiHub files to $(pwd)"
     cp -R ./apiProxy/* . 
   enabled: "true"
@@ -117,7 +115,7 @@ steps:
     jdkVersionOption: '1.8'
     jdkArchitectureOption: 'x64'
     publishJUnitResults: true
-    goals: "process-resources -q -Pgoogleapi -Dcommit=$(GIT_COMMIT) -Dbranch=$(GIT_BRANCH) -Dauthor=$(AUTHOR_EMAIL) -e"
+    goals: "process-resources -q -Pgoogleapi -Dcommit=$(GIT_COMMIT) -Dbranch=$(GIT_BRANCH) -e"
 
 
 # Maven Package proxy bundle
