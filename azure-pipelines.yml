@@ -22,7 +22,6 @@ variables:
   # GCP_SERVICE_ACCOUNT is stored in Azure Pipeline variable settings
   
 
-
 steps:
 
 # Azure pipeline doest allow to change job working directory :(
